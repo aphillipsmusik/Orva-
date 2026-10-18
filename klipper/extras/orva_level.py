@@ -1,7 +1,8 @@
 # Orva bed leveling: 9-point polar pattern that starts wherever the bed is
 # already sitting, with every probe since power-on remembered and refit.
 #
-#  * 6 points around the edge (every 60 deg) and 3 near center.  The first
+#  * 6 points around the edge (every 60 deg, 110 mm out) and 3 near center
+#    (23 mm out).  The first
 #    center point is on the last edge point's line (arm just moves in), the
 #    second is directly behind it past center (arm reaches through center,
 #    bed doesn't turn), the third needs a quarter turn.
@@ -26,8 +27,8 @@ class OrvaLevel:
     def __init__(self, config):
         self.printer = config.get_printer()
         self.gcode = self.printer.lookup_object('gcode')
-        self.edge_radius = config.getfloat('edge_radius', 86., above=0.)
-        self.center_radius = config.getfloat('center_radius', 18., above=0.)
+        self.edge_radius = config.getfloat('edge_radius', 110., above=0.)
+        self.center_radius = config.getfloat('center_radius', 23., above=0.)
         self.probe_height = config.getfloat('probe_height', 3., above=0.)
         self.travel_speed = config.getfloat('travel_speed', 80., above=0.)
         self.lift_speed = config.getfloat('lift_speed', 10., above=0.)

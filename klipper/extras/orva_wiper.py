@@ -24,14 +24,14 @@ class OrvaWiper:
         self.up_angle = config.getfloat('up_angle', 90.)
         self.down_angle = config.getfloat('down_angle', 0.)
         self.lift_time = config.getfloat('lift_time', 0.4, minval=0.)
-        self.radius = config.getfloat('radius', 106., above=0.)
-        self.r_min = config.getfloat('radius_min', 103.5, above=0.)
-        self.r_max = config.getfloat('radius_max', 108.5, above=0.)
+        self.radius = config.getfloat('radius', 141., above=0.)
+        self.r_min = config.getfloat('radius_min', 138.5, above=0.)
+        self.r_max = config.getfloat('radius_max', 143.5, above=0.)
         self.wipe_z = config.getfloat('wipe_z', 1.5)
         self.passes = config.getint('passes', 3, minval=1)
         self.wipe_speed = config.getfloat('wipe_speed', 60., above=0.)
         self.travel_speed = config.getfloat('travel_speed', 150., above=0.)
-        self.overhang_radius = config.getfloat('overhang_radius', 98.,
+        self.overhang_radius = config.getfloat('overhang_radius', 128.,
                                                above=0.)
         # brush half-width plus toolhead clearance, as an angle at the brush
         self.clear_width = config.getfloat('clear_width', 30., above=0.)

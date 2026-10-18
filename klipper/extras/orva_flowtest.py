@@ -38,7 +38,7 @@ class OrvaFlowTest:
         self.printer = config.get_printer()
         self.gcode = self.printer.lookup_object('gcode')
         self.offset = config.getfloat('offset', 3.5, above=0.)
-        self.max_radius = config.getfloat('max_radius', 96.8, above=0.)
+        self.max_radius = config.getfloat('max_radius', 126.8, above=0.)
         self.speeds = [float(v) for v in config.getlist(
             'speeds', ['35', '75', '125'])]
         self.line_width = config.getfloat('line_width', 0.45, above=0.)

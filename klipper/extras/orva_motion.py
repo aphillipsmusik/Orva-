@@ -25,14 +25,14 @@ class OrvaMotion:
         self.cfg = og.MotionConfig(
             reach=0.,   # filled in from the kinematics at connect
             snap=config.getfloat('center_snap', 0.3, minval=0.),
-            split_radius=config.getfloat('split_radius', 30., above=0.),
+            split_radius=config.getfloat('split_radius', 38., above=0.),
             split_len=config.getfloat('split_length', 2., above=0.),
             min_split=config.getfloat('min_split_length', 0.2, above=0.))
-        self.first_layer_radius = config.getfloat('first_layer_radius', 98.,
+        self.first_layer_radius = config.getfloat('first_layer_radius', 128.,
                                                   above=0.)
         self.first_layer_max_z = config.getfloat('first_layer_max_z', 0.6,
                                                  minval=0.)
-        self.zstop_radius = config.getfloat('zstop_radius', 106.7, above=0.)
+        self.zstop_radius = config.getfloat('zstop_radius', 141.6, above=0.)
         self.zstop_band = config.getfloat('zstop_band', 3., minval=0.)
         self.zstop_clear_z = config.getfloat('zstop_clear_z', 3.5, minval=0.)
         self.pivot_speed = math.radians(config.getfloat(

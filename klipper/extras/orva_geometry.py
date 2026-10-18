@@ -197,7 +197,7 @@ def center_speed_limit(p0, p1, omega_max, alpha_max):
 ######################################################################
 
 class MotionConfig:
-    def __init__(self, reach=25., snap=0.3, split_radius=30.,
+    def __init__(self, reach=32., snap=0.3, split_radius=38.,
                  split_len=2., min_split=0.2):
         self.reach = reach              # arm travel past center (mm)
         self.snap = snap                # lines passing closer than this
@@ -316,7 +316,7 @@ EDGE_ANGLES = [k * 60. for k in range(6)]
 CENTER_ANGLES = [300., 120., 210.]
 
 
-def probe_pattern(a0, edge_r=86., center_r=18.):
+def probe_pattern(a0, edge_r=110., center_r=23.):
     """9 probe points starting at bed angle a0 (radians), in probe order."""
     pts = []
     for d in EDGE_ANGLES:
