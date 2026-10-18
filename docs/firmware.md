@@ -10,7 +10,7 @@ keep working.
 
 | File | What it does |
 |---|---|
-| `klipper/kinematics/orva_polar.py` | Polar kinematics: bed angle + arm that can reach 25 mm past center. Z homing on the rim stop. Bed-only pivots. |
+| `klipper/kinematics/orva_polar.py` | Polar kinematics: bed angle + arm that can reach 32 mm past center. Z homing on the rim stop. Bed-only pivots. |
 | `klipper/chelper/kin_orva_polar.c` | Step generation for the bed and arm. Compiled automatically into its own small library the first time Klipper starts. |
 | `klipper/extras/orva_geometry.py` | The math shared by everything else (no Klipper imports, unit tested). |
 | `klipper/extras/orva_motion.py` | G-code move transform: routing through center, pivots, splitting near center, Z correction, safety checks. |
@@ -26,7 +26,7 @@ keep working.
 
 A point on the bed is printed by turning the bed to angle φ and sliding the
 arm to distance r. Every point has two solutions: (φ, +r) and (φ + 180°, −r).
-The second, "behind center", is only possible within the arm's 25 mm reach
+The second, "behind center", is only possible within the arm's 32 mm reach
 past center.
 
 The two solutions can only be swapped where they meet: at the exact center.
@@ -74,8 +74,8 @@ nozzle, every Z home measures the nozzle against the bed itself.
   reattached, and on demand (`ORVA_RELEVEL`, the touch bar's Re-level button,
   or `orva relevel` from a computer). Picking a new print does **not**
   re-level; `PRINT_START` only levels if nothing valid is remembered.
-* Starts wherever the bed is sitting. 6 points every 60° at 86 mm, then 3 near
-  center at 18 mm: the first on the last edge point's line, the second
+* Starts wherever the bed is sitting. 6 points every 60° at 110 mm, then 3 near
+  center at 23 mm: the first on the last edge point's line, the second
   directly behind it past center (no bed turn), the third a quarter turn away.
 * Every probe since power-on is kept and refit together (tilt + dome, plus
   saddle and twist once there are 12+ points). Each run usually starts at a
@@ -113,7 +113,7 @@ configured `default_flow_ratio` / `default_pressure_advance` are applied.
 ## Wiper
 
 The brush rises at power-on and stays up for normal prints. If any object's
-outline reaches past the bed (`overhang_radius`, 98 mm), `ORVA_WIPER_MODE
+outline reaches past the bed (`overhang_radius`, 128 mm), `ORVA_WIPER_MODE
 MODE=AUTO` switches to overhang mode: the brush stays down and `ORVA_WIPE`
 raises it only at a bed angle where nothing overhangs, while the bed is
 stopped. The Z-min switch is not on the lift.
@@ -121,7 +121,7 @@ stopped. The Z-min switch is not on the lift.
 ## Safety checks (orva_motion)
 
 * Extrusion below `first_layer_max_z` (0.6 mm) beyond `first_layer_radius`
-  (98 mm) is refused: only overhangs may reach past the print surface.
+  (128 mm) is refused: only overhangs may reach past the print surface.
 * Extrusion below `zstop_clear_z` (3.5 mm) at the Z stop's radius is refused:
   it would hit the fixed plunger as the bed turns.
 
@@ -148,9 +148,10 @@ stopped. The Z-min switch is not on the lift.
 
 Import `slicer/orva.ini` into PrusaSlicer (OrcaSlicer: same settings by hand):
 
-* Round bed, 98 mm radius, origin at the center. `slicer/orva-overhang.ini`
-  uses 110.5 mm for parts that overhang past the bed (keep their first layers
-  inside 98 mm; the firmware refuses otherwise).
+* Round bed, 256 mm diameter (128 mm radius), origin at the center, 256 mm
+  tall. `slicer/orva-overhang.ini` uses a 146.5 mm radius for parts that
+  overhang past the print surface (keep their first layers inside 128 mm; the
+  firmware refuses otherwise).
 * G-code flavor **Klipper**, **Label objects: firmware specific**.
 * Start G-code `PRINT_START BED=[first_layer_bed_temperature]
   EXTRUDER=[first_layer_temperature]`, end G-code `PRINT_END`.

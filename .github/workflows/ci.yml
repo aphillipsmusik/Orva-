@@ -13,7 +13,12 @@ jobs:
         with:
           python-version: "3.12"
       - name: Python packages
-        run: pip install cffi greenlet pyserial jinja2 markupsafe
+        run: pip install cffi greenlet pyserial jinja2 markupsafe shapely
+      - name: Ring gear meshes with its pinion
+        run: |
+          cd hardware/ring_gear
+          python make_ring_gear.py --check --out /tmp/ring | tee /tmp/ring.txt
+          grep -q "mesh check: .*(ok)" /tmp/ring.txt
       - name: Geometry unit tests
         run: python tests/test_geometry.py -v
       - name: Klipper checkout and Linux MCU dictionary

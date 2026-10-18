@@ -1,9 +1,12 @@
 # Orva
 
 Firmware and software for **Orva**, a portable polar 3D printer: a round
-heated bed that turns, an arm on a detachable tower that reaches 25 mm past
-the bed's center, and a touch bar on the front of the base. Everything packs
+heated bed that turns, an arm on a detachable tower that reaches past the
+bed's center, and a touch bar on the front of the base. Everything packs
 flat into one bag.
+
+Build volume is sized like a Bambu Lab P1S, but round: a **256 mm diameter
+print surface and 256 mm of height** (see [docs/dimensions.md](docs/dimensions.md)).
 
 Orva runs on [Klipper](https://www.klipper3d.org/). This repo adds:
 
@@ -34,7 +37,9 @@ Orva runs on [Klipper](https://www.klipper3d.org/). This repo adds:
 |---|---|
 | Install on the printer, Wi-Fi, computer | [docs/connect.md](docs/connect.md) |
 | How the firmware works, commands, slicer setup | [docs/firmware.md](docs/firmware.md) |
+| Sizes of every part | [docs/dimensions.md](docs/dimensions.md) |
 | What to buy and where | [docs/parts.md](docs/parts.md) |
+| Laser-cut bed ring gear | [hardware/ring_gear](hardware/ring_gear/README.md) |
 | Touch bar | [touchbar/README.md](touchbar/README.md) |
 
 Quick install on the CB1 (after flashing BTT's Klipper image):
@@ -63,6 +68,7 @@ config/                            printer.cfg, orva.cfg, macros, Moonraker
 system/                            Wi-Fi services and tools for the CB1
 desktop/orva.py                    command-line tool for your computer
 touchbar/                          ESP32-S3 firmware (PlatformIO)
+hardware/ring_gear/                laser-cut bed gear: generator, DXF, SVG
 slicer/                            PrusaSlicer presets
 tests/                             unit, C and Klipper batch tests
 docs/                              guides and parts list
