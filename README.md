@@ -71,8 +71,7 @@ install.sh                         installer
 
 ## License
 
-The repository is Apache-2.0 (see LICENSE), except:
-
-* `klipper/` is GPLv3 (`klipper/COPYING`), because it is derived from and
-  runs inside Klipper.
-* `touchbar/` is GPLv3, because it links LILYGO's GPL-3.0 display libraries.
+GPL-3.0 (see LICENSE). Orva's firmware runs inside Klipper and its touch
+bar links LILYGO's display libraries, both GPL-3.0, so the whole project
+uses the same license. You can use, change and share it; if you distribute
+a modified version, share its source under the same terms.
