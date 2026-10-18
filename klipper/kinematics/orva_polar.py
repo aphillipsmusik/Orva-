@@ -125,7 +125,7 @@ class OrvaPolarKinematics:
         self.omega_max = config.getfloat('max_angular_velocity', 6.,
                                          above=0.)
         self.alpha_max = config.getfloat('max_angular_accel', 60., above=0.)
-        self.z_home_radius = config.getfloat('z_home_radius', 141.,
+        self.z_home_radius = config.getfloat('z_home_radius', 147.,
                                              above=0., maxval=arm_max)
         self.z_home_travel_speed = config.getfloat('z_home_travel_speed',
                                                    50., above=0.)
