@@ -1,0 +1,11 @@
+[Unit]
+Description=Orva Wi-Fi setup page (port 8090)
+After=NetworkManager.service
+
+[Service]
+ExecStart=/usr/local/bin/orva-setup 8090
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
