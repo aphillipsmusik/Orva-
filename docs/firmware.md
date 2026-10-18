@@ -149,7 +149,7 @@ stopped. The Z-min switch is not on the lift.
 Import `slicer/orva.ini` into PrusaSlicer (OrcaSlicer: same settings by hand):
 
 * Round bed, 256 mm diameter (128 mm radius), origin at the center, 256 mm
-  tall. `slicer/orva-overhang.ini` uses a 146.5 mm radius for parts that
+  tall. `slicer/orva-overhang.ini` uses a 152 mm radius for parts that
   overhang past the print surface (keep their first layers inside 128 mm; the
   firmware refuses otherwise).
 * G-code flavor **Klipper**, **Label objects: firmware specific**.

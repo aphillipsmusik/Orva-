@@ -23,8 +23,7 @@ it falls back to the hotspot again, so you can add that network the same way.
 Over SSH, `orva-wifi` does the same from a shell (`orva-wifi add SSID PASS`,
 `orva-wifi scan`, `orva-wifi status`).
 
-Because the base is metal, plan an antenna exit for the CB1 (see
-docs/parts.md).
+Because the base is metal, plan an antenna exit for the CB1.
 
 ## From your computer
 

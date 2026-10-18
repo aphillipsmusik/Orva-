@@ -28,8 +28,9 @@ Orva runs on [Klipper](https://www.klipper3d.org/). This repo adds:
   starts an "Orva-XXXX" setup hotspot, a setup page, mDNS name orva.local,
   Mainsail in the browser, slicer upload, and a small `orva` command-line tool.
 * **Touch bar firmware** (`touchbar`) for the LILYGO T-Display-S3 Long.
-* **Slicer presets** (`slicer`) and a **parts list with vendors**
-  (`docs/parts.md`).
+* **Slicer presets** (`slicer`).
+* **Fabrication files** (`hardware`): the laser-cut bed ring gear and the
+  bed's ball race.
 
 ## Start here
 
@@ -38,8 +39,8 @@ Orva runs on [Klipper](https://www.klipper3d.org/). This repo adds:
 | Install on the printer, Wi-Fi, computer | [docs/connect.md](docs/connect.md) |
 | How the firmware works, commands, slicer setup | [docs/firmware.md](docs/firmware.md) |
 | Sizes of every part | [docs/dimensions.md](docs/dimensions.md) |
-| What to buy and where | [docs/parts.md](docs/parts.md) |
 | Laser-cut bed ring gear | [hardware/ring_gear](hardware/ring_gear/README.md) |
+| Bed ball race | [hardware/bed_race](hardware/bed_race/README.md) |
 | Touch bar | [touchbar/README.md](touchbar/README.md) |
 
 Quick install on the CB1 (after flashing BTT's Klipper image):
@@ -69,9 +70,10 @@ system/                            Wi-Fi services and tools for the CB1
 desktop/orva.py                    command-line tool for your computer
 touchbar/                          ESP32-S3 firmware (PlatformIO)
 hardware/ring_gear/                laser-cut bed gear: generator, DXF, SVG
+hardware/bed_race/                 bed ball race: generator, DXFs, section
 slicer/                            PrusaSlicer presets
 tests/                             unit, C and Klipper batch tests
-docs/                              guides and parts list
+docs/                              guides
 install.sh                         installer
 ```
 

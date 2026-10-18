@@ -32,7 +32,7 @@ class OrvaMotion:
                                                   above=0.)
         self.first_layer_max_z = config.getfloat('first_layer_max_z', 0.6,
                                                  minval=0.)
-        self.zstop_radius = config.getfloat('zstop_radius', 141.6, above=0.)
+        self.zstop_radius = config.getfloat('zstop_radius', 147.5, above=0.)
         self.zstop_band = config.getfloat('zstop_band', 3., minval=0.)
         self.zstop_clear_z = config.getfloat('zstop_clear_z', 3.5, minval=0.)
         self.pivot_speed = math.radians(config.getfloat(
