@@ -1,0 +1,44 @@
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  firmware:
+    name: Klipper modules and kinematics
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python packages
+        run: pip install cffi greenlet pyserial jinja2 markupsafe
+      - name: Geometry unit tests
+        run: python tests/test_geometry.py -v
+      - name: Klipper checkout and Linux MCU dictionary
+        run: |
+          git clone --depth 1 https://github.com/Klipper3d/klipper.git ~/klipper
+          cd ~/klipper
+          printf 'CONFIG_MACH_LINUX=y\n' > .config
+          make olddefconfig
+          make -j4
+      - name: C kinematics tests (real trapq moves)
+        run: KLIPPER_DIR=~/klipper python tests/test_kinematics_c.py -v
+      - name: Klipper batch-mode run
+        run: KLIPPER_DIR=~/klipper tests/klippy/run.sh
+
+  touchbar:
+    name: Touch bar firmware build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: PlatformIO
+        run: pip install platformio
+      - name: LILYGO libraries
+        run: touchbar/fetch_libs.sh
+      - name: Build
+        run: cd touchbar && pio run

@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""orva-setup: tiny Wi-Fi setup page for Orva.
+
+While Orva is in hotspot mode (no saved network in range), join its
+"Orva-XXXX" network and open http://10.42.0.1:8090 to pick your Wi-Fi and
+type the password.  The same JSON API is used by the `orva` desktop tool.
+Outside hotspot mode the page only answers requests from the hotspot subnet
+or localhost, so it can't be used to change Wi-Fi from elsewhere.
+"""
+import html, json, subprocess, sys
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import parse_qs
+
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8090
+STATE = "/run/orva/net.json"
+
+
+def net_state():
+    try:
+        with open(STATE) as f:
+            return json.load(f)
+    except Exception:
+        return {"mode": "unknown"}
+
+
+def scan():
+    out = subprocess.run(["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY", "dev",
+                          "wifi", "list", "--rescan", "yes"],
+                         capture_output=True, text=True).stdout
+    seen, nets = set(), []
+    for line in out.splitlines():
+        parts = line.split(":")
+        if len(parts) < 3 or not parts[0] or parts[0] in seen:
+            continue
+        seen.add(parts[0])
+        nets.append({"ssid": parts[0], "signal": int(parts[1] or 0),
+                     "secure": bool(parts[2])})
+    return sorted(nets, key=lambda n: -n["signal"])
+
+
+def connect(ssid, password):
+    subprocess.run(["nmcli", "con", "down", "orva-hotspot"],
+                   capture_output=True)
+    cmd = ["nmcli", "dev", "wifi", "connect", ssid]
+    if password:
+        cmd += ["password", password]
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+    return r.returncode == 0, (r.stdout + r.stderr).strip()
+
+
+PAGE = """<!doctype html><meta name=viewport content="width=device-width">
+<title>Orva Wi-Fi</title><style>body{font:16px system-ui;margin:24px;
+max-width:420px}input,select,button{font:inherit;width:100%%;padding:10px;
+margin:6px 0}</style><h2>Orva Wi-Fi</h2><p>Now: %s</p>
+<form method=post action=/connect><select name=ssid>%s</select>
+<input name=password type=password placeholder="Password">
+<button>Connect</button></form><p>%s</p>"""
+
+
+class Handler(BaseHTTPRequestHandler):
+    def allowed(self):
+        ip = self.client_address[0]
+        return (net_state().get("mode") == "hotspot"
+                or ip.startswith("10.42.0.") or ip == "127.0.0.1")
+
+    def send(self, code, body, ctype="text/html"):
+        data = body.encode()
+        self.send_response(code)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def do_GET(self):
+        if not self.allowed():
+            return self.send(403, "Wi-Fi setup is only available in "
+                                  "hotspot mode")
+        if self.path.startswith("/api/state"):
+            return self.send(200, json.dumps(net_state()), "application/json")
+        if self.path.startswith("/api/scan"):
+            return self.send(200, json.dumps(scan()), "application/json")
+        st = net_state()
+        now = html.escape("%s %s" % (st.get("mode", ""), st.get("ssid", "")))
+        opts = "".join("<option>%s</option>" % html.escape(n["ssid"])
+                       for n in scan())
+        self.send(200, PAGE % (now, opts, ""))
+
+    def do_POST(self):
+        if not self.allowed():
+            return self.send(403, "forbidden")
+        n = int(self.headers.get("Content-Length", 0))
+        raw = self.rfile.read(n).decode()
+        if self.path.startswith("/api/connect"):
+            req = json.loads(raw or "{}")
+        else:
+            req = {k: v[0] for k, v in parse_qs(raw).items()}
+        ok, msg = connect(req.get("ssid", ""), req.get("password", ""))
+        if self.path.startswith("/api/"):
+            return self.send(200 if ok else 400,
+                             json.dumps({"ok": ok, "message": msg}),
+                             "application/json")
+        self.send(200, PAGE % ("connecting...", "", html.escape(
+            "Connected. Orva will now be at http://orva.local"
+            if ok else "Failed: " + msg)))
+
+    def log_message(self, *a):
+        pass
+
+
+if __name__ == "__main__":
+    ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()

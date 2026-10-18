@@ -1,0 +1,12 @@
+[Unit]
+Description=Orva Wi-Fi (join saved network or start setup hotspot)
+After=NetworkManager.service
+Wants=NetworkManager.service
+
+[Service]
+ExecStart=/usr/local/bin/orva-net
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
