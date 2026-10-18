@@ -1,0 +1,34 @@
+#!/bin/bash
+# orva-wifi: manage Orva's Wi-Fi from a shell (or the Mainsail console).
+usage() {
+    cat <<USAGE
+orva-wifi status              show the current network and address
+orva-wifi scan                list networks in range
+orva-wifi add SSID [PASSWORD] join a network and remember it
+orva-wifi forget SSID         forget a saved network
+orva-wifi hotspot             switch to the setup hotspot now
+orva-wifi hotspot-info        show the hotspot name and password
+USAGE
+}
+case "${1:-status}" in
+    status)
+        cat /run/orva/net.json 2>/dev/null || echo "orva-net not running"; echo
+        nmcli -t -f DEVICE,STATE,CONNECTION dev | grep -i wifi || true ;;
+    scan) nmcli -f SSID,SIGNAL,SECURITY dev wifi list --rescan yes ;;
+    add)
+        [ -n "${2:-}" ] || { usage; exit 1; }
+        sudo nmcli con down orva-hotspot >/dev/null 2>&1
+        if [ -n "${3:-}" ]; then
+            sudo nmcli dev wifi connect "$2" password "$3"
+        else
+            sudo nmcli dev wifi connect "$2"
+        fi ;;
+    forget) sudo nmcli con delete "$2" ;;
+    hotspot)
+        . /etc/orva/hotspot.conf
+        sudo nmcli dev wifi hotspot ifname "${ORVA_WIFI_IFACE:-wlan0}" \
+            con-name orva-hotspot ssid "$SSID" password "$PASS" ;;
+    hotspot-info) sudo cat /etc/orva/hotspot.conf ;;
+    -h|--help|help) usage ;;
+    *) usage; exit 1 ;;
+esac

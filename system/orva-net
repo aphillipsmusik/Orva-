@@ -1,0 +1,79 @@
+#!/bin/bash
+# orva-net: keep Orva reachable over Wi-Fi.
+#  - At boot, wait for NetworkManager to join a saved Wi-Fi network.
+#  - If none is in range, start a hotspot "Orva-XXXX" so a phone or laptop
+#    can connect and add a network (Mainsail at http://10.42.0.1, or the
+#    orva-wifi command over SSH).
+#  - Keep checking; when a saved network comes back, leave hotspot mode.
+#  - Write the state to /run/orva/net.json for the touch bar.
+# Needs NetworkManager (nmcli), which the BTT CB1 / Armbian images use.
+set -u
+IFACE="${ORVA_WIFI_IFACE:-wlan0}"
+STATE_DIR=/run/orva
+STATE="$STATE_DIR/net.json"
+CONF=/etc/orva/hotspot.conf
+mkdir -p "$STATE_DIR" /etc/orva
+
+if [ ! -f "$CONF" ]; then
+    SUFFIX=$(cat /sys/class/net/"$IFACE"/address 2>/dev/null | tr -d ':' | tail -c 5 | tr a-f A-F)
+    PASS=$(tr -dc 'a-z0-9' </dev/urandom | head -c 8)
+    printf 'SSID=Orva-%s\nPASS=%s\n' "${SUFFIX:-0000}" "$PASS" > "$CONF"
+    chmod 600 "$CONF"
+fi
+. "$CONF"
+
+write_state() {   # mode ssid ip
+    printf '{"mode":"%s","ssid":"%s","ip":"%s","hotspot_ssid":"%s","hotspot_pass":"%s"}\n' \
+        "$1" "$2" "$3" "$( [ "$1" = hotspot ] && echo "$SSID" )" \
+        "$( [ "$1" = hotspot ] && echo "$PASS" )" > "$STATE.tmp"
+    mv "$STATE.tmp" "$STATE"
+    chmod 644 "$STATE"
+}
+
+current_ssid() {
+    nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '$1=="yes"{print $2; exit}'
+}
+current_ip() {
+    ip -4 -o addr show "$IFACE" 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -1
+}
+hotspot_on() { nmcli -t -f NAME con show --active | grep -qx orva-hotspot; }
+
+start_hotspot() {
+    nmcli con delete orva-hotspot >/dev/null 2>&1
+    nmcli dev wifi hotspot ifname "$IFACE" con-name orva-hotspot \
+        ssid "$SSID" password "$PASS" >/dev/null 2>&1
+}
+
+saved_in_range() {
+    local saved
+    saved=$(nmcli -t -f NAME,TYPE con show | awk -F: '$2=="802-11-wireless" && $1!="orva-hotspot"{print $1}')
+    [ -z "$saved" ] && return 1
+    nmcli -t -f ssid dev wifi list --rescan yes 2>/dev/null | grep -qxF -f <(
+        for c in $saved; do nmcli -g 802-11-wireless.ssid con show "$c"; done)
+}
+
+# Boot: give saved networks up to 45 s
+for _ in $(seq 1 45); do
+    [ -n "$(current_ssid)" ] && break
+    sleep 1
+done
+
+while true; do
+    if hotspot_on; then
+        if saved_in_range; then
+            nmcli con down orva-hotspot >/dev/null 2>&1
+            sleep 15
+            continue
+        fi
+        write_state hotspot "$SSID" "$(current_ip)"
+    else
+        ssid=$(current_ssid)
+        if [ -n "$ssid" ]; then
+            write_state client "$ssid" "$(current_ip)"
+        else
+            write_state offline "" ""
+            start_hotspot
+        fi
+    fi
+    sleep 20
+done
