@@ -6,7 +6,7 @@ look at) and check that it meshes with its pinion.
     python3 make_ring_gear.py --check      # also runs the mesh check (needs shapely)
 
 Default: module 2, 120 teeth, 20 deg pressure angle -> 240 mm pitch circle,
-fitting under the 266 mm bed plate (256 mm print surface) with a bolt band,
+bolting under the 280 mm hot plate (256 mm print surface) inside the ball race,
 driven by a stock module 2, 16 tooth steel pinion (centre distance 104 mm).
 A 20T -> 60T GT2 belt stage between the motor and the pinion makes the total
 reduction 120:16 x 60:20 = 22.5:1.
